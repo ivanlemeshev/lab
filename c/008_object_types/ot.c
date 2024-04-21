@@ -82,8 +82,7 @@ short int itsi;
 // commonly used integer type. Its size and range can vary depending on the
 // system, but it's usually at least 16 bits, with a range from -32768 to 32767
 // on a 16-bit system. It is in the range of -2147483648 to 2147483647 on a
-// 32-bit system. It is in the range of -9223372036854775808 to
-// 9223372036854775807 on a 64-bit system.
+// 32-bit and 64-bit systems.
 int iti;
 
 // The line declares a variable named itli of type long int. A long int is an
