@@ -3,6 +3,7 @@
     "files.associations": {
         "stdbool.h": "c",
         "wchar.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "stdio.h": "c"
     }
 }
