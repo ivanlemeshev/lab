@@ -1,3 +1,8 @@
 {
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4 }"
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4 }",
+    "files.associations": {
+        "stdbool.h": "c",
+        "wchar.h": "c",
+        "stdlib.h": "c"
+    }
 }

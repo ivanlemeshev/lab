@@ -22,13 +22,16 @@ int main(void) {
     // initialized with the values 21 and 17 respectively.
     int a = 21;
     int b = 17;
+
     // The addresses of a and b are then passed to the swap function using the
     // address-of operator &. After the swap function is called, the values of a
     // and b are swapped.
     swap(&a, &b);
+
     // The printf function is then used to print the values of a and b to the
     // console, demonstrating that their values have indeed been swapped.
     printf("main: a = %d, b = %d\n", a, b);
+
     // The program then returns 0, signaling successful execution to the
     // operating system.
     return 0;

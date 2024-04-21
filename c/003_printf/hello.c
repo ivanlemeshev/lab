@@ -3,7 +3,6 @@
 // operations. In this case, it's needed for the puts() function used later in
 // the program.
 #include <stdio.h>
-
 // This is another preprocessor directive that includes the standard library in
 // the program. This library contains general purpose functions, including
 // memory management, process control, conversions and others. In this case,
@@ -33,6 +32,7 @@ int main(void) {
         //  an error occurred.
         return EXIT_FAILURE;
     }
+
     // This line indicates that the program has finished successfully.
     // EXIT_SUCCESS is a macro (defined in stdlib.h) that represents a
     // successful program termination status. In most systems, it's defined as

@@ -29,6 +29,7 @@ int main(void) {
         //  an error occurred.
         return EXIT_FAILURE;
     }
+
     // This line indicates that the program has finished successfully.
     // EXIT_SUCCESS is a macro (defined in stdlib.h) that represents a
     // successful program termination status. In most systems, it's defined as
