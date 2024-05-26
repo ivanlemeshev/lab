@@ -1,0 +1,6 @@
+---
+- name: Provision VM
+  hosts: all
+  become: yes
+  become_method: sudo
+  remote_user: vagrant
