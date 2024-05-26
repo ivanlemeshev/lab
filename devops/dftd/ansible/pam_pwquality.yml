@@ -1,0 +1,38 @@
+---
+- name: Install libpam-pwquality
+  package:
+    name: "libpam-pwquality"
+    state: present
+
+- name: Configure pam_pwquality
+  lineinfile:
+    path: "/etc/pam.d/common-password"
+    regexp: "pam_pwquality.so"
+    # A configuration line for the PAM (Pluggable Authentication Modules)
+    # system, specifically for the pam_pwquality module.
+    #
+    # The pam_pwquality module is used to enforce password quality requirements.
+    # It can check for things like length, use of different character classes,
+    # and similarity to previous passwords.
+    #
+    # password required pam_pwquality.so: This indicates that the pam_pwquality
+    # module is required for password-related operations. The .so extension
+    # indicates that pam_pwquality is a shared library.
+    #
+    # minlen=12: This sets the minimum password length to 12 characters.
+    #
+    # lcredit=-1, ucredit=-1, dcredit=-1, ocredit=-1: These options control the
+    # requirements for lower-case, upper-case, digit, and other
+    # (non-alphanumeric) characters in the password. A value of -1 means that at
+    # least one character from each class is required.
+    #
+    # retry=3: This sets the number of times the user is allowed to retry
+    # password entry before the module returns an error.
+    #
+    # enforce_for_root: This option means that the password quality requirements
+    # are also enforced for root password changes. Without this option, the root
+    # user could set a password that doesn't meet the requirements.
+    #
+    # See map pam_pwquality for more information.
+    line: "password required pam_pwquality.so minlen=12 lcredit=-1 ucredit=-1 dcredit=-1 ocredit=-1 retry=3 enforce_for_root"
+    state: present
