@@ -9,4 +9,5 @@
   tasks:
     - import_tasks: ./pam_pwquality.yml
     - import_tasks: ./user_and_group.yml
+    - import_tasks: ./authorized_keys.yml
   handlers:
