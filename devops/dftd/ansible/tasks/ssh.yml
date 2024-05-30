@@ -1,0 +1,21 @@
+- name: Disable password authentication for SSH
+  lineinfile:
+    dest: "/etc/pam.d/sshd"
+    regex: "@include common-auth"
+    line: "#@include common-auth"
+
+- name: Set ChallengeResponseAuthentication to Yes
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^ChallengeResponseAuthentication (yes|no)"
+    line: "ChallengeResponseAuthentication yes"
+    state: present
+
+- name: Set Authentication Methods for gilfoyle, vagrant, and ubuntu
+  blockinfile:
+    path: "/etc/ssh/sshd_config"
+    block: |
+      Match User "ubuntu,vagrant,gilfoyle"
+          AuthenticationMethods publickey
+    state: present
+  notify: "Restart SSH Server"
