@@ -7,7 +7,9 @@
   vars_files:
     - ./secrets.yml
   tasks:
-    - import_tasks: ./pam_pwquality.yml
-    - import_tasks: ./user_and_group.yml
-    - import_tasks: ./authorized_keys.yml
+    - import_tasks: ./tasks/pam_pwquality.yml
+    - import_tasks: ./tasks/user_and_group.yml
+    - import_tasks: ./tasks/authorized_keys.yml
+    - import_tasks: ./tasks/ssh.yml
   handlers:
+    - import_tasks: ./handlers/restart_ssh.yml
