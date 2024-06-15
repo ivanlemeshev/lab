@@ -1,0 +1,17 @@
+- name: Copy the kubectl binary to /usr/local/bin and make it executable
+  ansible.builtin.copy:
+    src: /opt/downloads/kubectl
+    dest: /usr/local/bin/kubectl
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: yes
+
+- name: Verify the kubectl installation
+  ansible.builtin.command: kubectl version --client
+  register: kubectl_version
+
+- name: Print the kubectl version
+  ansible.builtin.debug:
+    var: kubectl_version
+    verbosity: 1

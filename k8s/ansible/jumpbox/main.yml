@@ -1,0 +1,10 @@
+---
+- name: Provision the jumpbox VM
+  hosts: all
+  become: yes
+  become_method: sudo
+  remote_user: vagrant
+  tasks:
+    - import_tasks: basic_setup.yml
+    - import_tasks: download_binaries.yml
+    - import_tasks: install_kubectl.yml

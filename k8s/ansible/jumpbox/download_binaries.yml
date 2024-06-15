@@ -1,0 +1,72 @@
+- name: Create a downloads directory if it does not exist
+  ansible.builtin.file:
+    path: /opt/downloads
+    state: directory
+    mode: '0755'
+
+- name: Download kubectl
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kubectl
+    dest: /opt/downloads/kubectl
+    checksum: sha512:09d8b0ee5974b58fdd9760b8ba53a0b8ae5cb5ac81fab77993764720b9058aa3b324b391d3a31a7218ea4abff8a727487a5073670a9e9260ea3f3024d3b3416f
+
+- name: Download kube-apiserver
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kube-apiserver
+    dest: /opt/downloads/kubet-apiserver
+    checksum: sha512:8d96bb9e3136fc30ff53ad859372a1719a5390af499d0360bbb860116231b8ab1c1df45b66f28045944c052463c55b59f79ea7e468501e9b2a1a992d87891066
+
+- name: Download kube-controller-manager
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kube-controller-manager
+    dest: /opt/downloads/kube-controller-manager
+    checksum: sha512:56d4c341c8e61f693333a42f171a482baef5b766ab9bd602826d275981e3abe15557c43176ffb0778e5095c7e5e0bced79796c8ea07d0a0062cc531b9b43d3eb
+
+- name: Download kube-scheduler
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kube-scheduler
+    dest: /opt/downloads/kube-scheduler
+    checksum: sha512:9d307febaac2aa1e08242f973b6eebe298878bbf2ff91fafcb232f5d145e5788af1b8c979f865d3a7b334b0ea705c65b769f1e41b6b7260adba98f1ca41bd934
+
+- name: Download kube-proxy
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kube-proxy
+    dest: /opt/downloads/kube-proxy
+    checksum: sha512:a3f6548e5a8ee4da5cc473547552fb6e4b43a3c2c5eb4775228f550527a5a5c6448cbbff2569416be78476eb57c9b54585b15ceb1dac27d5fcf125da0d40847b
+
+- name: Download kubelet
+  ansible.builtin.get_url:
+    url: https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kubelet
+    dest: /opt/downloads/kubelet
+    checksum: sha512:df112df63843b72f61af070b526e5c4670f548bc86cc55a3fc5758c23059b780fd3f3616d580186afba0068809b46c0ece5f73d989e6ff86ff3af720694fb9b9
+
+
+- name: Download crictl
+  ansible.builtin.get_url:
+    url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28.0/crictl-v1.28.0-linux-amd64.tar.gz
+    dest: /opt/downloads/crictl-v1.28.0-linux-amd64.tar.gz
+    checksum: sha512:28824e32c48b9fc70318b2935ce49c3fd923c7855299b609eb2e18c65eee5734abf927aa1929cee3568a3f8fb3cb14aea7a1963271db621f23e3c55674428ed9
+
+- name: Download runc
+  ansible.builtin.get_url:
+    url: https://github.com/opencontainers/runc/releases/download/v1.1.9/runc.amd64
+    dest: /opt/downloads/runc.amd64
+    checksum: sha256:b9bfdd4cb27cddbb6172a442df165a80bfc0538a676fbca1a6a6c8f4c6933b43
+
+- name: Download CNI plugins
+  ansible.builtin.get_url:
+    url: https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz
+    dest: /opt/downloads/cni-plugins-linux-amd64-v1.3.0.tgz
+    checksum: sha512:5d0324ca8a3c90c680b6e1fddb245a2255582fa15949ba1f3c6bb7323df9d3af754dae98d6e40ac9ccafb2999c932df2c4288d418949a4915d928eb23c090540
+
+- name: Download containerd
+  ansible.builtin.get_url:
+    url: https://github.com/containerd/containerd/releases/download/v1.7.8/containerd-1.7.8-linux-amd64.tar.gz
+    dest: /opt/downloads/containerd-1.7.8-linux-amd64.tar.gz
+    checksum: sha256:5f1d017a5a7359514d6187d6656e88fb2a592d107e6298db7963dbddb9a111d9
+
+- name: Download etcd
+  ansible.builtin.get_url:
+    url: https://github.com/etcd-io/etcd/releases/download/v3.4.27/etcd-v3.4.27-linux-amd64.tar.gz
+    dest: /opt/downloads
+    checksum: sha256:a32d21e006252dbc3405b0645ba8468021ed41376974b573285927bf39b39eb9
