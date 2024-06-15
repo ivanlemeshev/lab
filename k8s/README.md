@@ -1,8 +1,8 @@
 # Kubernetes The Hard Way
 
-Learning Kubernetes based on the tutorial [Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) 
+Learning Kubernetes based on the tutorial [Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way).
 
-- [Ubuntu 24.04](https://ubuntu.com/)
+- [Ubuntu 24.04 LTS](https://ubuntu.com/) or [Pop!_OS 22.04 LTS](https://pop.system76.com/)
 - [VMware Workstation Pro](https://support.broadcom.com/group/ecx/productdownloads?subfamily=VMware+Workstation+Pro)
 - [VMware Host Modules](https://github.com/mkubecek/vmware-host-modules)
 - [Vagrant](https://www.vagrantup.com/)

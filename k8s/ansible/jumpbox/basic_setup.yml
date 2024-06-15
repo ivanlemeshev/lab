@@ -1,0 +1,25 @@
+- name: Update the package list
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Upgrade the system
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: Install packages
+  ansible.builtin.apt:
+    pkg:
+    - wget
+    - curl
+    - vim
+    - openssl
+    - git
+
+- name: Remove useless packages from the cache
+  ansible.builtin.apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer required and purge their configuration files
+  ansible.builtin.apt:
+    autoremove: yes
+    purge: true
