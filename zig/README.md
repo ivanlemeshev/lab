@@ -3,6 +3,6 @@
 
 ## Run tests
 
-```shell
+```bash
 make test name=leap_year
 ```
