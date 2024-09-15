@@ -4,5 +4,5 @@
 ## Run tests
 
 ```bash
-make test name=leap_year
+zig test hello_world.zig
 ```
