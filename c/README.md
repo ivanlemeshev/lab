@@ -1,6 +1,6 @@
 # C Programming
 
-## Compile and Run
+## Compile and run using cc
 
 ```bash
 cc hello.c
@@ -9,5 +9,17 @@ cc hello.c
 
 ```bash
 cc -o hello hello.c
+./hello
+```
+
+## Compile and run using zig cc
+
+```bash
+zig cc hello.c
+./a.out
+```
+
+```bash
+zig cc -o hello hello.c
 ./hello
 ```
