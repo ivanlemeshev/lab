@@ -1,0 +1,6 @@
+# It is used for markdown files
+printWidth: 80
+useTabs: false
+tabWidth: 2
+proseWrap: "always"
+endOfLine: "lf"
