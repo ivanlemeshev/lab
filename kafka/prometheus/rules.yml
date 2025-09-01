@@ -1,0 +1,6 @@
+groups:
+  - name: Kafka
+    rules:
+      - alert: Kafka Metrics Not Reachable
+        expr: up{job="kafka"} == 0
+        for: 1m
