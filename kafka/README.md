@@ -20,6 +20,16 @@
     - [Events](#events)
     - [Commands](#commands)
   - [Message Structure](#message-structure)
+- [Logs](#logs)
+  - [Basic Properties of a Log](#basic-properties-of-a-log)
+  - [Kafka as a Log](#kafka-as-a-log)
+  - [Kafka as a Distributed System](#kafka-as-a-distributed-system)
+  - [Partitioning and Keys](#partitioning-and-keys)
+    - [Create Topic with Multiple Partitions](#create-topic-with-multiple-partitions)
+  - [Consumer Groups](#consumer-groups)
+    - [Create Consumer Group](#create-consumer-group)
+  - [Replication](#replication)
+    - [Create Topic with Replication](#create-topic-with-replication)
 
 ## Run Kafka Cluster
 
