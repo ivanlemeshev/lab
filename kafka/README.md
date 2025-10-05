@@ -1,5 +1,26 @@
 # Kafka Labs
 
+- [Run Kafka Cluster](#run-kafka-cluster)
+- [Stop Kafka Cluster](#stop-kafka-cluster)
+- [Access Kafka Broker](#access-kafka-broker)
+- [Create Kafka Topic](#create-kafka-topic)
+- [Produce Messages to Topic](#produce-messages-to-topic)
+- [Consume Messages from Topic](#consume-messages-from-topic)
+- [Consume Messages from Topic (from beginning)](#consume-messages-from-topic-from-beginning)
+- [Run Kafka Producer](#run-kafka-producer)
+- [Run Kafka Consumer](#run-kafka-consumer)
+- [Describe Kafka Topic](#describe-kafka-topic)
+- [List Kafka Topics](#list-kafka-topics)
+- [Delete Kafka Topic](#delete-kafka-topic)
+- [Create, Customize, and Delete Topics](#create-customize-and-delete-topics)
+- [Messages](#messages)
+  - [Message Types](#message-types)
+    - [States](#states)
+    - [Deltas](#deltas)
+    - [Events](#events)
+    - [Commands](#commands)
+  - [Message Structure](#message-structure)
+
 ## Run Kafka Cluster
 
 ```bash
@@ -391,3 +412,250 @@ Kafka Record:
 - Headers: Optional, key-value pairs for additional metadata (Array of key-value
   pairs). It is used for technical metadata, not business data.
 - Timestamp: The time the record was created or received by the broker (Long).
+
+## Logs
+
+Databases store any changes to data in the commit log. If data is added,
+changed, or deleted, the database first writes this change to the commit log and
+then to the corresponding tables. If the database crashes, it can recover the
+data by replaying the commit log.
+
+Kafka is based on logs as a central data structure. The log is the core element
+of the system.
+
+### Basic Properties of a Log
+
+- Order and sorting
+  - Messages are sorted by time (oldest to newest)
+- Writing and reading direction
+  - Messages are written to the end of the log
+  - Messages are read from oldest to newest
+- Immutability
+  - Messages are immutable (cannot be changed or deleted)
+
+A log is a list of events on which we define the following operations:
+
+- Write operation: Append a new event to the end of the list
+- Read operation: Start reading events from a particular entry and read them
+  from oldest to newest
+
+To remember a position in the log, we number entries. The first entry has the
+position 0, the second entry position 1, and so on. The position is called
+offset. The offset shows where a message is in the log and points to the entry
+to read next. Kafka assigns offsets automatically. The offset is unique within a
+partition. Offsets are stored inside the `__consumer_offsets` topic.
+
+### Kafka as a Log
+
+Kafka is not a central database of the system, it is a central data hub. It
+stores historical data. Each service can choose suitable technology to store
+data.
+
+### Kafka as a Distributed System
+
+Kafka is a distributed log. It distributes data across multiple servers. The log
+itself is one of the simplest data structures for storing amounts of data. A log
+is easy to replicate (copy message by message) and to split (take multiple logs
+instead of one).
+
+### Partitioning and Keys
+
+The simplest way to divide data among multiple subsystems is to partition the
+data, also known as sharding in database systems. We do not care about the order
+of data for different entities. We only care about the order of data for the
+same entity. Therefore, we can partition data by entity.
+
+The topic is divided into multiple partitions. Each partition is an ordered,
+immutable sequence of messages that is continually appended to. Each message in
+the partition is assigned a unique offset. The partitions in a topic are
+distributed across multiple brokers. Kafka guarantees the order of messages
+within a partition, but not across partitions. To guarantee the order of
+messages for the same entity, we need to send all messages for the same entity
+to the same partition. We can achieve this by using a key. The key is used to
+determine the partition to which the message is sent. Messages with the same key
+are sent to the same partition. The key is optional. If no key is provided,
+messages are distributed randomly across partitions
+(`partition_number = hash(key) % number_of_partitions`).
+
+#### Create Topic with Multiple Partitions
+
+Create a topic with 2 partitions:
+
+```bash
+./kafka-topics.sh \
+  --create \
+  --topic products.prices.changelog.multi-partitions \
+  --partitions 2 \
+  --replication-factor 1 \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Describe the topic:
+
+```bash
+./kafka-topics.sh \
+  --describe \
+  --topic products.prices.changelog.multi-partitions \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Produce some data:
+
+```bash
+./kafka-console-producer.sh \
+  --topic products.prices.changelog.multi-partitions \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-D to finish.
+
+Consume the data:
+
+```bash
+./kafka-console-consumer.sh \
+  --topic products.prices.changelog.multi-partitions \
+  --from-beginning \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-C to finish.
+
+Produce some data with keys:
+
+```bash
+./kafka-console-producer.sh \
+  --topic products.prices.changelog.multi-partitions \
+  --property parse.key=true \
+  --property key.separator=":" \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-D to finish.
+
+Consume the data with keys:
+
+```bash
+./kafka-console-consumer.sh \
+  --topic products.prices.changelog.multi-partitions \
+  --property print.key=true \
+  --from-beginning \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-C to finish.
+
+### Consumer Groups
+
+A consumer group is a group of consumers that work together to consume messages
+from a topic. It allows for reading messages independently and in parallel by
+different services. Each consumer in the group is assigned a subset of
+partitions to consume from. This allows for parallel processing of messages and
+increases the throughput of the system. Each message is consumed by only one
+consumer in the group. If a consumer fails, the partitions assigned to that
+consumer are reassigned to other consumers in the group. This provides fault
+tolerance and ensures that messages are not lost.
+
+#### Create Consumer Group
+
+Create a topic with 3 partitions:
+
+```bash
+./kafka-topics.sh \
+  --create \
+  --topic products.prices.changelog.consumer-groups \
+  --partitions 3 \
+  --replication-factor 1 \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Produce some data:
+
+```bash
+./kafka-console-producer.sh \
+  --topic products.prices.changelog.consumer-groups \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-D to finish.
+
+Start consumer 1 in group `price-service`:
+
+```bash
+./kafka-console-consumer.sh \
+  --topic products.prices.changelog.consumer-groups \
+  --group price-service \
+  --from-beginning \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-C to finish.
+
+Start consumer 2 in group `price-service`:
+
+```bash
+./kafka-console-consumer.sh \
+  --topic products.prices.changelog.consumer-groups \
+  --group price-service \
+  --from-beginning \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-C to finish.
+
+Start consumer 1 in group `analytics-service`:
+
+```bash
+./kafka-console-consumer.sh \
+  --topic products.prices.changelog.consumer-groups \
+  --group analytics-service \
+  --from-beginning \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Press Ctrl-C to finish.
+
+### Replication
+
+It is used to prevent data loss and to increase reliability.
+
+#### Create Topic with Replication
+
+Create a topic with replication factor 2:
+
+```bash
+./kafka-topics.sh \
+  --create \
+  --topic products.prices.changelog.replication \
+  --partitions 3 \
+  --replication-factor 2 \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Logically the replication factor cannot be greater than the number of brokers.
+
+Create a topic with replication factor 4 (will fail):
+
+```bash
+./kafka-topics.sh \
+  --create \
+  --topic products.prices.changelog.replication.fail \
+  --partitions 3 \
+  --replication-factor 4 \
+  --bootstrap-server kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092
+```
+
+Output:
+
+```bash
+Error while executing topic command : Unable to replicate the partition 4 time(s): The target replication factor of 4 cannot be reached because only 3 broker(s) are registered.
+[2025-10-05 18:49:14,321] ERROR org.apache.kafka.common.errors.InvalidReplicationFactorException: Unable to replicate the partition 4 time(s): The target replication factor of 4 cannot be reached because only 3 broker(s) are registered.
+ (org.apache.kafka.tools.TopicCommand)
+```
+
+Kafka's replication strategy follows the one leader, multiple followers
+principle. There is one broker that is the leader for a partition. The leader is
+responsible for all reads and writes for the partition. The other brokers that
+have a replica of the partition are called followers. The followers replicate
+the data from the leader. If the leader fails, one of the followers is elected
+as the new leader. This ensures that the partition is always available for reads
+and writes.
