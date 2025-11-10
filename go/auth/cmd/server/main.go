@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	gateway "lem/go/auth/internal/gateway"
+	repos "lem/go/auth/internal/repos"
 	services "lem/go/auth/internal/services"
 	pb "lem/go/auth/proto"
 )
@@ -25,11 +26,13 @@ func startGRPCServer() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	usersRepo := repos.NewFakeUsersRepository()
+
 	s := grpc.NewServer()
 
-	pb.RegisterAuthServiceServer(s, &services.AuthServer{})
-	pb.RegisterUsersServiceServer(s, &services.UsersServer{})
-	pb.RegisterOrdersServiceServer(s, &services.OrdersServer{})
+	pb.RegisterAuthServiceServer(s, services.NewAuthServer(usersRepo))
+	pb.RegisterUsersServiceServer(s, services.NewUsersServer(usersRepo))
+	pb.RegisterOrdersServiceServer(s, services.NewOrdersServer())
 
 	log.Printf("gRPC server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {

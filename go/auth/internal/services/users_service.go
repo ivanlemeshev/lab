@@ -2,24 +2,32 @@ package services
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	repos "lem/go/auth/internal/repos"
 	pb "lem/go/auth/proto"
 )
 
-// UsersServer implements the UsersService
+// UsersServer implements the UsersService.
 type UsersServer struct {
 	pb.UnimplementedUsersServiceServer
+	users repos.UserRepository
 }
 
-// GetUser is a protected endpoint
+// NewUsersServer creates a new UsersServer.
+func NewUsersServer(usersRepo repos.UserRepository) *UsersServer {
+	return &UsersServer{
+		users: usersRepo,
+	}
+}
+
+// GetUser retrieves user information.
 func (s *UsersServer) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserResponse, error) {
-	// **THIS IS THE KEY PART**
-	// We read the identity from the gRPC metadata passed by the gateway
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "metadata is not provided")
@@ -27,23 +35,27 @@ func (s *UsersServer) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 
 	userID := md.Get("x-user-id")
 	userRole := md.Get("x-user-role")
-
 	if len(userID) == 0 || len(userRole) == 0 {
 		return nil, status.Error(codes.Unauthenticated, "user identity not in metadata")
 	}
 
 	log.Printf("GetUser called by UserID: %s, Role: %s", userID[0], userRole[0])
 
-	// **AUTHORIZATION LOGIC**
-	// A user can only get their own info, but an admin can get anyone's info.
 	if userRole[0] != "admin" && userID[0] != req.UserId {
 		return nil, status.Error(codes.PermissionDenied, "you can only access your own user data")
 	}
 
-	// Dummy response (in a real app, query a database)
+	user, err := s.users.FindByUsername(req.UserId)
+	if errors.Is(err, repos.ErrNotFound) {
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
 	return &pb.UserResponse{
-		UserId: req.UserId,
-		Name:   "Dummy User Name",
-		Role:   "user", // This would be from the DB
+		UserId: user.ID,
+		Name:   user.Username,
+		Role:   user.Role.String(),
 	}, nil
 }

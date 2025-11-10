@@ -47,3 +47,8 @@ generate:
 		--grpc-gateway_out ./proto --grpc-gateway_opt paths=source_relative \
 		proto/services.proto
 	@echo "✅ Code generation complete."
+
+.PHONY: test
+test:
+	@echo "🧪 Running tests..."
+	go test -v -race -cover ./...

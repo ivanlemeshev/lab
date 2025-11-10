@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	users "lem/go/auth/internal/users"
 	pb "lem/go/auth/proto"
 )
 
@@ -16,9 +17,13 @@ type OrdersServer struct {
 	pb.UnimplementedOrdersServiceServer
 }
 
-// GetOrder is a protected endpoint
+// NewOrdersServer creates a new OrdersServer.
+func NewOrdersServer() *OrdersServer {
+	return &OrdersServer{}
+}
+
+// GetOrder retrieves order information.
 func (s *OrdersServer) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.OrderResponse, error) {
-	// Read identity from gRPC metadata
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "metadata is not provided")
@@ -33,16 +38,13 @@ func (s *OrdersServer) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*
 
 	log.Printf("GetOrder called by UserID: %s, Role: %s", userID[0], userRole[0])
 
-	// **AUTHORIZATION LOGIC**
-	// Only admins can access orders.
-	if userRole[0] != "admin" {
+	if userRole[0] != users.RoleAdmin.String() {
 		return nil, status.Error(codes.PermissionDenied, "only admins can access orders")
 	}
 
-	// Dummy response
 	return &pb.OrderResponse{
 		OrderId: req.OrderId,
 		Item:    "Dummy Item",
-		UserId:  "u-user-123", // The user who placed the order
+		UserId:  "u-user-123",
 	}, nil
 }

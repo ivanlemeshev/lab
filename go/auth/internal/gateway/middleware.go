@@ -12,18 +12,17 @@ import (
 	auth "lem/go/auth/internal/auth"
 )
 
-// AuthenticationMiddleware intercepts HTTP requests
+// AuthenticationMiddleware intercepts HTTP requests.
 func AuthenticationMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Gateway: Received request for %s", r.URL.Path)
 
-		// 1. Skip auth for the public login endpoint
+		// Skip auth for the public login endpoint
 		if r.URL.Path == "/v1/login" {
 			h.ServeHTTP(w, r)
 			return
 		}
 
-		// 2. Find the token
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, "missing authorization header", http.StatusUnauthorized)
@@ -36,7 +35,6 @@ func AuthenticationMiddleware(h http.Handler) http.Handler {
 			return
 		}
 
-		// 3. Validate the token
 		claims, err := auth.ValidateToken(tokenString)
 		if err != nil {
 			log.Printf("Token validation error: %v", err)
@@ -44,14 +42,9 @@ func AuthenticationMiddleware(h http.Handler) http.Handler {
 			return
 		}
 
-		// 4. Token is valid!
-		// We add the user's identity as *new* HTTP headers.
-		// The gateway (in main.go) will be configured to turn
-		// these into gRPC metadata.
 		r.Header.Set("X-User-Id", claims.UserID)
-		r.Header.Set("X-User-Role", claims.Role)
+		r.Header.Set("X-User-Role", claims.Role.String())
 
-		// We've authenticated. Pass the request to the gRPC-Gateway mux.
 		h.ServeHTTP(w, r)
 	})
 }
@@ -69,10 +62,8 @@ func CustomMetadataAnnotator(ctx context.Context, req *http.Request) metadata.MD
 	return md
 }
 
-// NewGatewayMux creates and configures the gRPC-Gateway multiplexer
+// NewGatewayMux creates and configures the gRPC-Gateway multiplexer.
 func NewGatewayMux() *runtime.ServeMux {
-	// This is the key! We tell the gateway to use our
-	// CustomMetadataAnnotator to map headers to gRPC metadata.
 	return runtime.NewServeMux(
 		runtime.WithMetadata(CustomMetadataAnnotator),
 	)
